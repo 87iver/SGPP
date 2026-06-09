@@ -1,0 +1,74 @@
+section {
+    width: 90%;
+    max-width: 1200px;
+
+    margin: 50px auto;
+
+    text-align: center;
+
+    background: rgba(0, 0, 0, 0.35);
+
+    padding: 40px;
+
+    border-radius: 15px;
+}
+
+section h2 {
+    margin-bottom: 20px;
+}
+
+/* ===== TARJETAS ===== */
+
+.cards {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.card {
+    width: 300px;
+
+    padding: 25px;
+
+    background: rgba(255, 255, 255, 0.15);
+
+    border-radius: 10px;
+}
+
+.card h3 {
+    margin-bottom: 10px;
+}
+/* ========================= */
+/* TABLETS */
+/* ========================= */
+
+@media (max-width: 768px) {
+
+    section {
+        padding: 25px;
+    }
+
+    .card {
+        width: 100%;
+        max-width: 400px;
+    }
+}
+/* ========================= */
+/* CELULARES */
+/* ========================= */
+
+@media (max-width: 480px) {
+
+    section h2 {
+        font-size: 1.4rem;
+    }
+
+    .card {
+        width: 100%;
+    }
+
+    footer {
+        font-size: 0.9rem;
+    }
+}
