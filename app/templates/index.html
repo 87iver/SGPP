@@ -1,95 +1,25 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SGPP - Sistema de Prácticas</title>
+{% extends 'layouts/base.html' %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='nav.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='section.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='footer.css') }}">
+{% block title %}
+Dashboard
+{% endblock %}
 
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
-    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
-</head>
+{% block pagina %}
+Dashboard
+{% endblock %}
 
-<body>
-    <nav>
-        <div class="logo">SGPP</div>
+{% block contenido %}
 
-        <ul>
-            <li><a href="/">Inicio</a></li>
-            <li><a href="#acerca">Acerca de</a></li>
-            <li><a href="#contacto">Contacto</a></li>
-            <li><a href="/login">Ingresar</a></li>
-        </ul>
-    </nav>
+<div class="page-header">
 
-
-    <div class="container">
-        <h1>SGPP</h1>
-
-        <p class="subtitulo">
-            Sistema de Gestión de Prácticas Profesionales
-        </p>
-
-        <p class="descripcion">
-            Plataforma diseñada para administrar estudiantes, empresas,
-            convenios y prácticas profesionales, facilitando el seguimiento
-            y control de todo el proceso académico y laboral.
-        </p>
-
-        <a href="/login" class="btn">Iniciar Sesión</a>
+    <div class="page-title">
+        Resumen del semestre
     </div>
 
-
-        <section class="beneficios">
-    <h2>¿Qué permite el sistema?</h2>
-
-    <div class="cards">
-        <div class="card">
-            <h3>Estudiantes</h3>
-            <p>Registro y seguimiento de estudiantes.</p>
-        </div>
-
-        <div class="card">
-            <h3>Prácticas</h3>
-            <p>Administración de prácticas profesionales.</p>
-        </div>
-
-        <div class="card">
-            <h3>Empresas</h3>
-            <p>Control de convenios y organizaciones.</p>
-        </div>
+    <div class="page-subtitle">
+        Período académico 2026 — II · Actualizado hoy
     </div>
-</section>
 
-<section>
-    <h2>Nuestro propósito</h2>
+</div>
 
-    <p>
-        Facilitar la gestión, seguimiento y control de las prácticas
-        profesionales de los estudiantes mediante una plataforma web
-        centralizada.
-    </p>
-</section>
-
-<section>
-    <h2>Tecnologías</h2>
-
-    <p>
-        Flask • Python • MySQL • HTML • CSS • JavaScript
-    </p>
-</section>
-
-
-
-
-
-    <footer>
-        <p>SGPP © 2026 - Sistema de Gestión de Prácticas Profesionales</p>
-    </footer>
-</body>
-</html>
+{% endblock %}

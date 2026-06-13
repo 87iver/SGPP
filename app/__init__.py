@@ -23,6 +23,9 @@ def create_app():
     from app.routes.estudiante import estudiante_bp
     app.register_blueprint(estudiante_bp)
 
+    from app.routes.practica import practica_bp
+    app.register_blueprint(practica_bp)
+
     from app import models
 
     return app
