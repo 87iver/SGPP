@@ -1,0 +1,177 @@
+{% extends 'layouts/base.html' %} {% block title %} Prácticas {% endblock %} {%
+block pagina %} Listado de Prácticas {% endblock %} {% block contenido %}
+
+<div class="pp-header">
+  <div>
+    <div class="pp-title">Listado de Prácticas</div>
+    <div class="pp-subtitle">
+      Período 2025 — II · {{ practicas|length }} registros
+    </div>
+  </div>
+  <a href="/registrar-practica" class="btn-add">
+    <i class="ti ti-plus"></i> Nueva práctica
+  </a>
+</div>
+
+<div class="pp-card">
+    
+  <div class="pp-toolbar">
+    <div class="pp-export-btns">
+      <button class="btn-export excel" onclick="exportExcel()">
+        <i class="ti ti-file-spreadsheet"></i> Excel
+      </button>
+      <button class="btn-export pdf" onclick="exportPdf()">
+        <i class="ti ti-file-type-pdf"></i> PDF
+      </button>
+      <button class="btn-export" onclick="window.print()">
+        <i class="ti ti-printer"></i> Imprimir
+      </button>
+    </div>
+
+    <div class="pp-filter-wrap">
+      <i class="ti ti-filter" style="font-size: 14px"></i>
+      Estado:
+      <select id="filtroEstado">
+        <option value="">Todos</option>
+        <option value="Activo">Activo</option>
+        <option value="Pendiente">Pendiente</option>
+        <option value="En revisión">En revisión</option>
+        <option value="Finalizado">Finalizado</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="pp-search-wrap">
+    <div class="pp-search">
+      <i class="ti ti-search"></i>
+      <input
+        type="text"
+        id="ppBuscar"
+        placeholder="Buscar por nombre, empresa, carrera…"
+      />
+    </div>
+  </div>
+
+  <div class="pp-table-wrap">
+    <table id="tablaPracticas" class="pp-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Estudiante</th>
+          <th>Institución</th>
+          <th>Fecha Inicio</th>
+          <th>Fecha Fin</th>
+          <th>Estado</th>
+          <th>Modalidad</th>
+          <th>Horas</th>
+          <th style="width: 90px">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for practica in practicas %}
+        <tr>
+          <td>{{ practica.id_practica }}</td>
+
+          <td>{{ practica.id_estudiante }}</td>
+
+          <td>{{ practica.id_institucion }}</td>
+
+          <td>{{ practica.fecha_inicio }}</td>
+
+          <td>{{ practica.fecha_fin }}</td>
+
+          <td>
+            <span class="badge bg-primary"> {{ practica.estado }} </span>
+          </td>
+
+          <td>{{ practica.modalidad }}</td>
+
+          <td>
+            {{ practica.horas_completadas }} / {{ practica.horas_requeridas }}
+          </td>
+
+          <td>
+            <div class="pp-actions">
+              <a href="" class="btn btn-info btn-sm" title="Ver"
+                ><i class="ti ti-eye"></i
+              ></a>
+              <a href="" class="btn btn-success btn-sm" title="Editar"
+                ><i class="ti ti-pencil"></i
+              ></a>
+              <a
+                href=""
+                class="btn btn-danger btn-sm"
+                title="Eliminar"
+                onclick="return confirm('¿Eliminar esta práctica?');"
+                ><i class="ti ti-trash"></i
+              ></a>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+
+        <tr>
+          <td colspan="9" class="text-center text-muted">
+            No existen prácticas registradas.
+          </td>
+        </tr>
+
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <th>#</th>
+          <th>Estudiante</th>
+          <th>Carrera</th>
+          <th>Empresa</th>
+          <th>Supervisor</th>
+          <th>Fecha inicio</th>
+          <th>Fecha fin</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<script>
+  var dt;
+
+  $(function () {
+    dt = $("#tablaPracticas").DataTable({
+      responsive: true,
+      lengthChange: false,
+      autoWidth: false,
+      pageLength: 10,
+      language: {
+        paginate: { previous: "← Anterior", next: "Siguiente →" },
+        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+        infoEmpty: "Sin registros disponibles",
+        emptyTable: "No hay prácticas registradas",
+        zeroRecords: "No se encontraron coincidencias",
+      },
+      buttons: ["excel", "pdf", "print"],
+      columnDefs: [{ orderable: false, targets: [0, 8] }],
+    });
+
+    // Buscador interno conectado a DataTables
+    $("#ppBuscar").on("keyup", function () {
+      dt.search(this.value).draw();
+    });
+
+    // Filtro por columna Estado (índice 7)
+    $("#filtroEstado").on("change", function () {
+      dt.column(7).search(this.value).draw();
+    });
+  });
+
+  function exportExcel() {
+    dt.button(".buttons-excel").trigger();
+  }
+  function exportPdf() {
+    dt.button(".buttons-pdf").trigger();
+  }
+</script>
+
+{% endblock %}
