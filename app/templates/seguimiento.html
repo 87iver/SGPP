@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Seguimiento</title>
+
+<style>
+
+body{
+    font-family:Arial;
+    background:#f4f4f4;
+    padding:30px;
+}
+
+form{
+    background:white;
+    max-width:600px;
+    margin:auto;
+    padding:25px;
+    border-radius:10px;
+}
+
+input,
+textarea{
+    width:100%;
+    padding:10px;
+    margin-top:5px;
+    margin-bottom:15px;
+}
+
+button{
+    background:#0066cc;
+    color:white;
+    border:none;
+    padding:10px 20px;
+    cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Registrar Avance</h1>
+
+<form method="POST">
+
+    <label>ID Práctica</label>
+    <input type="number" name="id_practica">
+
+    <label>Fecha</label>
+    <input type="date" name="fecha">
+
+    <label>Observación</label>
+    <textarea name="observacion"></textarea>
+
+    <label>Porcentaje de avance</label>
+    <input type="number" name="porcentaje_avance">
+
+    <label>Horas registradas</label>
+    <input type="number" name="horas_registradas">
+
+    <button type="submit">
+        Guardar Seguimiento
+    </button>
+
+</form>
+
+</body>
+</html>
