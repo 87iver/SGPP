@@ -1,21 +1,17 @@
+# app/__init__.py
+
 from flask import Flask, render_template
-from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 
-db = SQLAlchemy()
 jwt = JWTManager()
 
 def create_app():
     app = Flask(__name__)
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/sgpp'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['JWT_SECRET_KEY'] = 'sgpp-secret'
 
-    db.init_app(app)
     jwt.init_app(app)
 
-    # ✔ ruta base correcta aquí
     @app.route('/')
     def home():
         return render_template('index.html')
@@ -40,5 +36,7 @@ def create_app():
     # ==========================
 
     from app import models
+    from app.routes.consultas import consultas_bp
+    app.register_blueprint(consultas_bp)
 
     return app

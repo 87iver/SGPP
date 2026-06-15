@@ -1,0 +1,106 @@
+{% extends 'layouts/base.html' %} {% block title %} Prácticas por Remuneracion {%
+endblock %} {% block pagina %} Prácticas por Remuneracion {% endblock %} {% block
+contenido %}
+
+<div class="pp-header">
+  <div>
+    <div class="pp-title">Prácticas por Remuneracion</div>
+    <div class="pp-subtitle">Período 2026 · {{ datos|length }} registros</div>
+  </div>
+  <a href="/consultas" class="btn-add">
+    <i class="ti ti-arrow-left"></i> Volver
+  </a>
+</div>
+
+<div class="pp-card">
+  <div class="pp-toolbar">
+    <div class="pp-export-btns">
+      <button class="btn-export excel" onclick="exportExcel()">
+        <i class="ti ti-file-spreadsheet"></i> Excel
+      </button>
+      <button class="btn-export pdf" onclick="exportPdf()">
+        <i class="ti ti-file-type-pdf"></i> PDF
+      </button>
+      <button class="btn-export" onclick="window.print()">
+        <i class="ti ti-printer"></i> Imprimir
+      </button>
+    </div>
+  </div>
+
+  <div class="pp-search-wrap">
+    <div class="pp-search">
+      <i class="ti ti-search"></i>
+      <input
+        type="text"
+        id="ppBuscar"
+        placeholder="Buscar por nombre, empresa, carrera…"
+      />
+    </div>
+  </div>
+
+  <div class="pp-table-wrap">
+    <table id="tablaIncompletas" class="pp-table">
+      <thead>
+        <tr>
+          <th>Remuneracion</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for fila in datos %}
+        <tr>
+          <td>{{ fila.remuneracion }}</td>
+          <td>{{ fila.total }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="2" class="text-center text-muted">
+            No hay prácticas registradas.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <th>Remuneracion</th>
+        <th>Total Prácticas</th>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<script>
+  var dt;
+
+  window.addEventListener("load", function () {
+    dt = $("#tablaIncompletas").DataTable({
+      responsive: true,
+      lengthChange: false,
+      autoWidth: false,
+      pageLength: 10,
+      language: {
+        paginate: { previous: "← Anterior", next: "Siguiente →" },
+        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+        infoEmpty: "Sin registros disponibles",
+        emptyTable: "No hay prácticas registradas",
+        zeroRecords: "No se encontraron coincidencias",
+      },
+      buttons: ["excel", "pdf", "print"],
+      columnDefs: [],
+    });
+
+    $("#ppBuscar").on("keyup", function () {
+      dt.search(this.value).draw();
+    });
+  });
+
+  function exportExcel() {
+    if (dt) dt.button(0).trigger();
+  }
+
+  function exportPdf() {
+    if (dt) dt.button(1).trigger();
+  }
+</script>
+
+{% endblock %}
