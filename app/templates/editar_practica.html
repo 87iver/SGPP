@@ -1,11 +1,11 @@
-{% extends 'layouts/base.html' %} {% block title %} Registrar Información de la
-Práctica Profesional {% endblock %} {% block pagina %} Registrar Información de
-la Práctica Profesional {% endblock %} {% block contenido %}
+{% extends 'layouts/base.html' %} {% block title %} Editar Información de la
+Práctica Profesional {% endblock %} {% block pagina %} Editar Información de la
+Práctica Profesional {% endblock %} {% block contenido %}
 
 <div class="page-header">
-  <div class="page-title">Registrar Información de la Práctica Profesional</div>
+  <div class="page-title">Editar Información de la Práctica Profesional</div>
   <div class="page-subtitle">
-    Complete el formulario para registrar una nueva práctica profesional
+    Complete el formulario para editar la información de la práctica profesional
   </div>
 </div>
 
@@ -13,7 +13,7 @@ la Práctica Profesional {% endblock %} {% block contenido %}
   <div class="card" style="border-top: 5px solid #2c72c8">
     <div class="card-header">
       <div class="page-subtitle">
-        Formulario de registro de práctica profesional
+        Formulario de edición de práctica profesional
       </div>
     </div>
 
@@ -21,21 +21,28 @@ la Práctica Profesional {% endblock %} {% block contenido %}
       <form id="formPractica" class="was-validated">
         <div class="row">
 
-        
+          
           <div class="col-md-6 mb-3">
             <label>Estudiante</label>
             <div class="input-group">
-              
-              <input type="hidden" id="id_estudiante" name="id_estudiante" required />
+
+              <input
+                type="hidden"
+                id="id_estudiante"
+                name="id_estudiante"
+                value="{{ practica.id_estudiante }}"
+                required
+              />
 
               <input
                 type="text"
                 class="form-control"
                 id="nombre_estudiante"
                 readonly
+                value="{{ practica.estudiante_nombre }} {{ practica.estudiante_apellido }}"
                 placeholder="Seleccione un estudiante"
               />
-
+              
               <button
                 type="button"
                 class="btn btn-primary"
@@ -52,12 +59,7 @@ la Práctica Profesional {% endblock %} {% block contenido %}
                 <div class="modal-content">
                   <div class="modal-header">
                     <h5 class="modal-title">Seleccionar Estudiante</h5>
-                    <button
-                      type="button"
-                      class="btn-close"
-                      data-bs-dismiss="modal"
-                      aria-label="Close"
-                    ></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
                     <div class="mb-3">
@@ -100,7 +102,6 @@ la Práctica Profesional {% endblock %} {% block contenido %}
                             <td>{{ est.nombre }}</td>
                             <td>{{ est.apellido }}</td>
                             <td>{{ est.ci }}</td>
-                            <!-- CORRECCIÓN 4: typo "carrerra" → "carrera" -->
                             <td>{{ est.carrera }}</td>
                             <td>{{ est.semestre }}</td>
                           </tr>
@@ -132,20 +133,27 @@ la Práctica Profesional {% endblock %} {% block contenido %}
             </div>
           </div>
 
-          <!--  INSTITUCIÓN  -->
+
           <div class="col-md-6 mb-3">
             <label>Institución</label>
             <div class="input-group">
-              <input type="hidden" id="id_institucion" name="id_institucion" required />
-
+              
+              <input
+                type="hidden"
+                id="id_institucion"
+                name="id_institucion"
+                value="{{ practica.id_institucion }}"
+                required
+              />
+              
               <input
                 type="text"
                 class="form-control"
                 id="nombre_institucion"
                 readonly
+                value="{{ practica.institucion_nombre }}"
                 placeholder="Seleccione una institución"
               />
-
               <button
                 type="button"
                 class="btn btn-primary"
@@ -162,12 +170,7 @@ la Práctica Profesional {% endblock %} {% block contenido %}
                 <div class="modal-content">
                   <div class="modal-header">
                     <h5 class="modal-title">Seleccionar Institución</h5>
-                    <button
-                      type="button"
-                      class="btn-close"
-                      data-bs-dismiss="modal"
-                      aria-label="Close"
-                    ></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
                     <div class="mb-3">
@@ -243,22 +246,20 @@ la Práctica Profesional {% endblock %} {% block contenido %}
         <div class="row">
           <div class="col-md-4 mb-3">
             <label>Fecha Inicio</label>
-            <input type="date" class="form-control" id="fecha_inicio" required />
+            <input type="date" class="form-control" id="fecha_inicio" value="{{ practica.fecha_inicio }}" required />
           </div>
-
           <div class="col-md-4 mb-3">
             <label>Fecha Fin</label>
-            <input type="date" class="form-control" id="fecha_fin" required />
+            <input type="date" class="form-control" id="fecha_fin" value="{{ practica.fecha_fin }}" required />
           </div>
-
           <div class="col-md-4 mb-3">
             <label>Estado</label>
             <select class="form-control" id="estado" required>
-              <option value="" selected disabled>Seleccionar</option>
-              <option>Pendiente</option>
-              <option>En Proceso</option>
-              <option>Finalizada</option>
-              <option>Cancelada</option>
+              <option value="" disabled>Seleccionar</option>
+              <option value="Pendiente" {% if practica.estado == 'Pendiente' %}selected{% endif %}>Pendiente</option>
+              <option value="En Proceso" {% if practica.estado == 'En Proceso' %}selected{% endif %}>En Proceso</option>
+              <option value="Finalizada" {% if practica.estado == 'Finalizada' %}selected{% endif %}>Finalizada</option>
+              <option value="Cancelada" {% if practica.estado == 'Cancelada' %}selected{% endif %}>Cancelada</option>
             </select>
           </div>
         </div>
@@ -266,28 +267,29 @@ la Práctica Profesional {% endblock %} {% block contenido %}
         <div class="row">
           <div class="col-md-4 mb-3">
             <label>Modalidad</label>
-            <select class="form-control" id="modalidad">
-              <option>Curricular</option>
-              <option>Extracurricular</option>
+            <select class="form-control" id="modalidad" required>
+              <option value="" disabled>Seleccionar</option>
+              <option value="Curricular" {% if practica.modalidad == 'Curricular' %}selected{% endif %}>Curricular</option>
+              <option value="Extracurricular" {% if practica.modalidad == 'Extracurricular' %}selected{% endif %}>Extracurricular</option>
             </select>
           </div>
-
           <div class="col-md-4 mb-3">
             <label>Remuneración</label>
-            <select class="form-control" id="remuneracion">
-              <option>Remunerada</option>
-              <option>No Remunerada</option>
+            <select class="form-control" id="remuneracion" required>
+              <option value="" disabled>Seleccionar</option>
+              <option value="Remunerada" {% if practica.remuneracion == 'Remunerada' %}selected{% endif %}>Remunerada</option>
+              <option value="No Remunerada" {% if practica.remuneracion == 'No Remunerada' %}selected{% endif %}>No Remunerada</option>
             </select>
           </div>
-
           <div class="col-md-4 mb-3">
             <label>Tipo Práctica</label>
-            <select class="form-control" id="tipo_practica">
-              <option>Pasantia</option>
-              <option>Trainee</option>
-              <option>Investigacion</option>
-              <option>Comunitaria</option>
-              <option>Organizacional</option>
+            <select class="form-control" id="tipo_practica" required>
+              <option value="" disabled>Seleccionar</option>
+              <option value="Pasantia" {% if practica.tipo_practica == 'Pasantia' %}selected{% endif %}>Pasantia</option>
+              <option value="Trainee" {% if practica.tipo_practica == 'Trainee' %}selected{% endif %}>Trainee</option>
+              <option value="Investigacion" {% if practica.tipo_practica == 'Investigacion' %}selected{% endif %}>Investigacion</option>
+              <option value="Comunitaria" {% if practica.tipo_practica == 'Comunitaria' %}selected{% endif %}>Comunitaria</option>
+              <option value="Organizacional" {% if practica.tipo_practica == 'Organizacional' %}selected{% endif %}>Organizacional</option>
             </select>
           </div>
         </div>
@@ -295,32 +297,28 @@ la Práctica Profesional {% endblock %} {% block contenido %}
         <div class="row">
           <div class="col-md-4 mb-3">
             <label>Horas Requeridas</label>
-            <input type="number" class="form-control" id="horas_requeridas" value="240" />
+            <input type="number" class="form-control" id="horas_requeridas" value="{{ practica.horas_requeridas }}" />
           </div>
-
           <div class="col-md-4 mb-3">
             <label>Horas Completadas</label>
-            <input type="number" class="form-control" id="horas_completadas" value="0" />
+            <input type="number" class="form-control" id="horas_completadas" value="{{ practica.horas_completadas }}" />
           </div>
-
           <div class="col-md-4 mb-3">
             <label>Área de Trabajo</label>
-            <input type="text" class="form-control" id="area_trabajo" />
+            <input type="text" class="form-control" id="area_trabajo" value="{{ practica.area_trabajo }}" />
           </div>
         </div>
 
         <div class="row">
           <div class="col-md-12 mb-3">
             <label>Descripción</label>
-            <textarea class="form-control" id="descripcion"></textarea>
+            <textarea class="form-control" id="descripcion">{{ practica.descripcion }}</textarea>
           </div>
         </div>
 
         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
           <a class="btn btn-secondary" href="/informacion_practicas">Volver</a>
-          <button type="submit" class="btn btn-primary me-md-2">
-            Registrar
-          </button>
+          <button type="submit" class="btn btn-primary me-md-2">Actualizar</button>
         </div>
       </form>
     </div>
@@ -345,22 +343,16 @@ la Práctica Profesional {% endblock %} {% block contenido %}
   
   function filtrarEstudiantes() {
     const texto = document.getElementById("buscarEstudiante").value.toLowerCase();
-    const filas = document.querySelectorAll("#bodyEstudiantes tr");
-
-    filas.forEach(function (fila) {
-      const contenido = fila.textContent.toLowerCase();
-      fila.style.display = contenido.includes(texto) ? "" : "none";
+    document.querySelectorAll("#bodyEstudiantes tr").forEach(function (fila) {
+      fila.style.display = fila.textContent.toLowerCase().includes(texto) ? "" : "none";
     });
   }
 
   
   function filtrarInstituciones() {
     const texto = document.getElementById("buscarInstitucion").value.toLowerCase();
-    const filas = document.querySelectorAll("#bodyInstituciones tr");
-
-    filas.forEach(function (fila) {
-      const contenido = fila.textContent.toLowerCase();
-      fila.style.display = contenido.includes(texto) ? "" : "none";
+    document.querySelectorAll("#bodyInstituciones tr").forEach(function (fila) {
+      fila.style.display = fila.textContent.toLowerCase().includes(texto) ? "" : "none";
     });
   }
 
@@ -380,24 +372,23 @@ la Práctica Profesional {% endblock %} {% block contenido %}
     e.preventDefault();
 
     const datos = {
-      id_estudiante:    parseInt(document.getElementById("id_estudiante").value),
-      id_institucion:   parseInt(document.getElementById("id_institucion").value),
-      fecha_inicio:     document.getElementById("fecha_inicio").value,
-      fecha_fin:        document.getElementById("fecha_fin").value,
-      estado:           document.getElementById("estado").value,
-      modalidad:        document.getElementById("modalidad").value,
-      remuneracion:     document.getElementById("remuneracion").value,
-      tipo_practica:    document.getElementById("tipo_practica").value,
-      horas_requeridas: parseInt(document.getElementById("horas_requeridas").value),
-      horas_completadas:parseInt(document.getElementById("horas_completadas").value),
-      area_trabajo:     document.getElementById("area_trabajo").value,
-      descripcion:      document.getElementById("descripcion").value,
+      id_estudiante:     parseInt(document.getElementById("id_estudiante").value),
+      id_institucion:    parseInt(document.getElementById("id_institucion").value),
+      fecha_inicio:      document.getElementById("fecha_inicio").value,
+      fecha_fin:         document.getElementById("fecha_fin").value,
+      estado:            document.getElementById("estado").value,
+      modalidad:         document.getElementById("modalidad").value,
+      remuneracion:      document.getElementById("remuneracion").value,
+      tipo_practica:     document.getElementById("tipo_practica").value,
+      horas_requeridas:  parseInt(document.getElementById("horas_requeridas").value),
+      horas_completadas: parseInt(document.getElementById("horas_completadas").value),
+      area_trabajo:      document.getElementById("area_trabajo").value,
+      descripcion:       document.getElementById("descripcion").value,
     };
 
-    
     try {
-      const respuesta = await fetch("/practicas", {
-        method: "POST",
+      const respuesta = await fetch("/practicas/{{ practica.id_practica }}", {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(datos),
       });
@@ -406,11 +397,11 @@ la Práctica Profesional {% endblock %} {% block contenido %}
       alert(resultado.mensaje);
 
       if (respuesta.ok) {
-        document.getElementById("formPractica").reset();
+        window.location.href = "/informacion_practicas";
       }
     } catch (error) {
       console.error(error);
-      alert("Error al registrar la práctica. Intente nuevamente.");
+      alert("Error al actualizar la práctica. Intente nuevamente.");
     }
   });
 </script>

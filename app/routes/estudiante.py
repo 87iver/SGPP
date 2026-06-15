@@ -1,23 +1,22 @@
+# app/routes/estudiante.py
+
 from flask import Blueprint, jsonify
-from app.models import Estudiante
+from app.database import get_connection
 
 estudiante_bp = Blueprint('estudiante', __name__)
 
 @estudiante_bp.route('/estudiantes', methods=['GET'])
 def listar_estudiantes():
 
-    estudiantes = Estudiante.query.all()
+    conn = get_connection()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                SELECT id_estudiante, matricula, nombre, apellido, ci, correo
+                FROM estudiante
+            """)
+            estudiantes = cursor.fetchall()
+    finally:
+        conn.close()
 
-    resultado = []
-
-    for e in estudiantes:
-        resultado.append({
-            "id": e.id_estudiante,
-            "matricula": e.matricula,
-            "nombre": e.nombre,
-            "apellido": e.apellido,
-            "ci": e.ci,
-            "correo": e.correo
-        })
-
-    return jsonify(resultado)
+    return jsonify(estudiantes)
