@@ -40,10 +40,18 @@
           <i class="ti ti-layout-dashboard"></i> Dashboard
         </a>
         <a href="/informacion_practicas" class="nav-item {% if request.path == '/informacion_practicas' %}active{% endif %}">
-          <i class="ti ti-file-text"></i> Prácticas Profesionales
+          <i class="ti ti-briefcase"></i> Prácticas Profesionales
         </a>
-        <a href="/consultas" class="nav-item {% if request.path == '/consultas' %}active{% endif %}">
-          <i class="ti ti-file-text"></i> Consultas y Reportes
+        <a href="/consultas" class="nav-item {% if request.path.startswith('/consultas') %}active{% endif %}">
+          <i class="ti ti-report-analytics"></i> Consultas y Reportes
+        </a>
+        
+        <a href="/seguimientos" class="nav-item {% if request.path.startswith('/seguimientos') %}active{% endif %}">
+          <i class="ti ti-list-details"></i> Seguimientos de practicas
+        </a>
+
+        <a href="/estado_practicas" class="nav-item {% if request.path.startswith('/estado_practicas') %}active{% endif %}">
+          <i class="ti ti-clipboard-check"></i> Estado de Prácticas
         </a>
       </nav>
 

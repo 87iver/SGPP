@@ -1,0 +1,294 @@
+{% extends 'layouts/base.html' %} {% block title %} Consultas y reportes
+{% endblock %} {% block pagina %} Seguimientos {% endblock %} {% block
+contenido %}
+<div class="pp-header">
+  <div>
+    <div class="pp-title">Listado de Seguimientos</div>
+    <div class="pp-subtitle">
+      Período 2025 — II · {{ seguimientos|length }} registros
+    </div>
+  </div>
+  <a href="/registrar-seguimiento" class="btn-add">
+    <i class="ti ti-plus"></i> Nuevo seguimiento
+  </a>
+</div>
+
+<div class="pp-card">
+  <div class="pp-toolbar">
+    <div class="pp-export-btns">
+      <button class="btn-export excel" onclick="exportExcel()">
+        <i class="ti ti-file-spreadsheet"></i> Excel
+      </button>
+      <button class="btn-export pdf" onclick="exportPdf()">
+        <i class="ti ti-file-type-pdf"></i> PDF
+      </button>
+      <button class="btn-export" onclick="window.print()">
+        <i class="ti ti-printer"></i> Imprimir
+      </button>
+    </div>
+
+    <div class="pp-filter-wrap">
+      <i class="ti ti-filter" style="font-size: 14px"></i>
+      Avance:
+      <select id="filtroAvance">
+        <option value="">Todos</option>
+        <option value="0-25">0% - 25%</option>
+        <option value="26-50">26% - 50%</option>
+        <option value="51-75">51% - 75%</option>
+        <option value="76-100">76% - 100%</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="pp-search-wrap">
+    <div class="pp-search">
+      <i class="ti ti-search"></i>
+      <input
+        type="text"
+        id="ppBuscar"
+        placeholder="Buscar por ID práctica, observación…"
+      />
+    </div>
+  </div>
+
+  <div class="pp-table-wrap">
+    <table id="tablaSeguimientos" class="pp-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>ID Práctica</th>
+          <th>Fecha</th>
+          <th>Observación</th>
+          <th>Avance (%)</th>
+          <th>Horas</th>
+          <th style="width: 90px">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in seguimientos %}
+        <tr>
+          <td>{{ s.id_seguimiento }}</td>
+          <td>{{ s.id_practica }}</td>
+          <td>{{ s.fecha }}</td>
+          <td>{{ s.observacion }}</td>
+          <td>{{ s.porcentaje_avance }}</td>
+          <td>{{ s.horas_registradas }}</td>
+
+          <td>
+            <div class="pp-actions">
+              <button
+                type="button"
+                class="btn btn-info btn-sm"
+                title="Ver"
+                data-bs-toggle="modal"
+                data-bs-target="#miModal{{ s.id_seguimiento }}"
+              >
+                <i class="ti ti-eye"></i>
+              </button>
+
+              <div
+                class="modal fade"
+                id="miModal{{ s.id_seguimiento }}"
+                tabindex="-1"
+                aria-hidden="true"
+              >
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">
+                        Información registrada del seguimiento
+                      </h5>
+                      <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                      ></button>
+                    </div>
+                    <div class="modal-body">
+                      <div class="card shadow-sm border-0">
+                        <div class="card-body p-4">
+
+                          <div class="row">
+                            <div class="col-md-6 mb-3">
+                              <label
+                                class="text-muted small text-uppercase fw-bold"
+                                >ID Práctica</label
+                              >
+                              <p class="fs-5 fw-semibold text-dark">
+                                {{ s.id_practica }}
+                              </p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                              <label
+                                class="text-muted small text-uppercase fw-bold"
+                                >Fecha</label
+                              >
+                              <p class="fs-5 fw-semibold text-dark">
+                                {{ s.fecha }}
+                              </p>
+                            </div>
+                          </div>
+
+                          <hr class="my-3" />
+
+                          <div class="row">
+                            <div class="col-md-6 mb-3">
+                              <label
+                                class="text-muted small text-uppercase fw-bold"
+                                >Avance</label
+                              >
+                              <br />
+                              <span class="badge bg-info text-dark"
+                                >{{ s.porcentaje_avance }}%</span
+                              >
+                            </div>
+                            <div class="col-md-6 mb-3">
+                              <label
+                                class="text-muted small text-uppercase fw-bold"
+                                >Horas Registradas</label
+                              >
+                              <p class="fw-bold">{{ s.horas_registradas }}</p>
+                            </div>
+                          </div>
+
+                          <div class="row mt-3">
+                            <div class="col-md-12">
+                              <div class="bg-light p-3 rounded">
+                                <label
+                                  class="text-muted small text-uppercase fw-bold"
+                                  >Observación</label
+                                >
+                                <p class="mb-0 text-secondary">
+                                  {{ s.observacion }}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <a 
+                href="/editar-seguimiento/{{ s.id_seguimiento }}"
+                class="btn btn-success btn-sm"
+                title="Editar"
+              >
+                <i class="ti ti-pencil"></i>
+              </a>
+              <button
+                class="btn btn-danger btn-sm"
+                onclick="eliminarSeguimiento({{ s.id_seguimiento }})"
+                title="Eliminar"
+              >
+                <i class="ti ti-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7" class="text-center text-muted">
+            No existen seguimientos registrados.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <th>#</th>
+          <th>ID Práctica</th>
+          <th>Fecha</th>
+          <th>Observación</th>
+          <th>Avance (%)</th>
+          <th>Horas</th>
+          <th>Acciones</th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  var dt;
+
+  $(function () {
+    dt = $("#tablaSeguimientos").DataTable({
+      responsive: true,
+      lengthChange: false,
+      autoWidth: false,
+      pageLength: 10,
+      language: {
+        paginate: { previous: "← Anterior", next: "Siguiente →" },
+        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+        infoEmpty: "Sin registros disponibles",
+        emptyTable: "No hay seguimientos registrados",
+        zeroRecords: "No se encontraron coincidencias",
+      },
+      buttons: ["excel", "pdf", "print"],
+      columnDefs: [{ orderable: false, targets: [6] }],
+    });
+
+    $("#ppBuscar").on("keyup", function () {
+      dt.search(this.value).draw();
+    });
+
+    $("#filtroAvance").on("change", function () {
+      const valor = this.value;
+      dt.column(4)
+        .search("")
+        .draw();
+
+      if (!valor) {
+        dt.column(4).search("").draw();
+        return;
+      }
+
+      const [min, max] = valor.split("-").map(Number);
+
+      dt.column(4)
+        .search(function (data) {
+          return true;
+        });
+
+      $.fn.dataTable.ext.search.push(function (settings, dataRow) {
+        const avance = parseFloat(dataRow[4]) || 0;
+        return avance >= min && avance <= max;
+      });
+
+      dt.draw();
+    });
+  });
+
+  function exportExcel() {
+    dt.button(0).trigger();
+  }
+  function exportPdf() {
+    dt.button(1).trigger();
+  }
+
+  async function eliminarSeguimiento(id) {
+    const confirmar = confirm("¿Está seguro de eliminar este seguimiento?");
+    if (!confirmar) return;
+
+    try {
+      const respuesta = await fetch(`/seguimiento/${id}`, { method: "DELETE" });
+      const resultado = await respuesta.json().catch(() => null);
+
+      if (!respuesta.ok) {
+        alert(resultado?.mensaje || `Error al eliminar el seguimiento (${respuesta.status})`);
+        return;
+      }
+
+      alert(resultado?.mensaje || "Seguimiento eliminado correctamente");
+      location.reload();
+    } catch (error) {
+      console.error(error);
+      alert("Error al eliminar el seguimiento");
+    }
+  }
+</script>
+{% endblock %}

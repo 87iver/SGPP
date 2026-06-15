@@ -1,0 +1,252 @@
+{% extends 'layouts/base.html' %} {% block title %} Editar Avance de la
+Práctica Profesional {% endblock %} {% block pagina %} Editar Avance de la
+Práctica Profesional {% endblock %} {% block contenido %}
+
+<div class="page-header">
+  <div class="page-title">Editar Avance de la Práctica Profesional</div>
+  <div class="page-subtitle">
+    Modifique los datos del seguimiento y guarde los cambios
+  </div>
+</div>
+
+<div class="container mt-5">
+  <div class="card" style="border-top: 5px solid #2c72c8">
+    <div class="card-header">
+      <div class="page-subtitle">
+        Formulario de edición de seguimiento
+      </div>
+    </div>
+
+    <div class="card-body">
+      <form id="formSeguimiento" class="was-validated">
+        <div class="row">
+
+
+          <div class="col-md-6 mb-3">
+            <label>Práctica</label>
+            <div class="input-group">
+              <input
+                type="hidden"
+                id="id_practica"
+                name="id_practica"
+                value="{{ seguimiento.id_practica }}"
+                required
+              />
+
+              <input
+                type="text"
+                class="form-control"
+                id="nombre_practica"
+                readonly
+                value="{{ seguimiento.estudiante_nombre }} {{ seguimiento.estudiante_apellido }} - {{ seguimiento.institucion_nombre }}"
+                placeholder="Seleccione una práctica"
+              />
+
+              <button
+                type="button"
+                class="btn btn-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#modalPractica"
+              >
+                Buscar
+              </button>
+            </div>
+
+            
+            <div class="modal fade" id="modalPractica" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Seleccionar Práctica</h5>
+                    <button
+                      type="button"
+                      class="btn-close"
+                      data-bs-dismiss="modal"
+                      aria-label="Close"
+                    ></button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="mb-3">
+                      <input
+                        type="text"
+                        id="buscarPractica"
+                        class="form-control"
+                        placeholder="Buscar práctica..."
+                        onkeyup="filtrarPracticas()"
+                      />
+                    </div>
+                    <div class="pp-table-wrap">
+                      <table id="tablaPracticas" class="pp-table">
+                        <thead>
+                          <tr>
+                            <th>#</th>
+                            <th style="width: 90px">Acciones</th>
+                            <th>Estudiante</th>
+                            <th>Institución</th>
+                            <th>Fecha Inicio</th>
+                            <th>Fecha Fin</th>
+                            <th>Estado</th>
+                          </tr>
+                        </thead>
+                        <tbody id="bodyPracticas">
+                          {% for practica in practicas %}
+                          <tr>
+                            <td>{{ practica.id_practica }}</td>
+                            <td>
+                              <button
+                                type="button"
+                                class="btn btn-success btn-sm"
+                                onclick="seleccionarPractica({{ practica.id_practica }}, '{{ practica.estudiante_nombre }} {{ practica.estudiante_apellido }} - {{ practica.institucion_nombre }}')"
+                              >
+                                Seleccionar
+                              </button>
+                            </td>
+                            <td>{{ practica.estudiante_nombre }} {{ practica.estudiante_apellido }}</td>
+                            <td>{{ practica.institucion_nombre }}</td>
+                            <td>{{ practica.fecha_inicio }}</td>
+                            <td>{{ practica.fecha_fin }}</td>
+                            <td>{{ practica.estado }}</td>
+                          </tr>
+                          {% else %}
+                          <tr>
+                            <td colspan="7" class="text-center text-muted">
+                              No existen prácticas registradas.
+                            </td>
+                          </tr>
+                          {% endfor %}
+                        </tbody>
+                        <tfoot>
+                          <tr>
+                            <th>#</th>
+                            <th>Acciones</th>
+                            <th>Estudiante</th>
+                            <th>Institución</th>
+                            <th>Fecha Inicio</th>
+                            <th>Fecha Fin</th>
+                            <th>Estado</th>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label>Fecha</label>
+            <input
+              type="date"
+              class="form-control"
+              id="fecha"
+              value="{{ seguimiento.fecha }}"
+              required
+            />
+          </div>
+
+        </div>
+
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label>Porcentaje de Avance</label>
+            <input
+              type="number"
+              class="form-control"
+              id="porcentaje_avance"
+              min="0"
+              max="100"
+              value="{{ seguimiento.porcentaje_avance }}"
+              required
+            />
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label>Horas Registradas</label>
+            <input
+              type="number"
+              class="form-control"
+              id="horas_registradas"
+              min="0"
+              value="{{ seguimiento.horas_registradas }}"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12 mb-3">
+            <label>Observación</label>
+            <textarea class="form-control" id="observacion" required>{{ seguimiento.observacion }}</textarea>
+          </div>
+        </div>
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <a class="btn btn-secondary" href="/seguimientos">Volver</a>
+          <button type="submit" class="btn btn-primary me-md-2">
+            Guardar Cambios
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+
+  function seleccionarPractica(id, nombre) {
+    document.getElementById("id_practica").value = id;
+    document.getElementById("nombre_practica").value = nombre;
+    bootstrap.Modal.getInstance(document.getElementById("modalPractica")).hide();
+  }
+
+
+  function filtrarPracticas() {
+    const texto = document.getElementById("buscarPractica").value.toLowerCase();
+    const filas = document.querySelectorAll("#bodyPracticas tr");
+
+    filas.forEach(function (fila) {
+      const contenido = fila.textContent.toLowerCase();
+      fila.style.display = contenido.includes(texto) ? "" : "none";
+    });
+  }
+
+
+  document.getElementById("modalPractica").addEventListener("hidden.bs.modal", function () {
+    document.getElementById("buscarPractica").value = "";
+    filtrarPracticas();
+  });
+
+
+  document.getElementById("formSeguimiento").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const datos = {
+      id_practica:        parseInt(document.getElementById("id_practica").value),
+      fecha:              document.getElementById("fecha").value,
+      observacion:        document.getElementById("observacion").value,
+      porcentaje_avance:  parseInt(document.getElementById("porcentaje_avance").value),
+      horas_registradas:  parseInt(document.getElementById("horas_registradas").value),
+    };
+
+    try {
+      const respuesta = await fetch("/seguimiento/{{ seguimiento.id_seguimiento }}", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datos),
+      });
+
+      const resultado = await respuesta.json();
+      alert(resultado.mensaje);
+
+      if (respuesta.ok) {
+        window.location.href = "/seguimientos";
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Error al actualizar el seguimiento. Intente nuevamente.");
+    }
+  });
+</script>
+
+{% endblock %}

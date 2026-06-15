@@ -1,0 +1,137 @@
+{% extends 'layouts/base.html' %} {% block title %} Estado de Prácticas
+{% endblock %} {% block pagina %} Estado de Prácticas {% endblock %} {%
+block contenido %}
+<div class="pp-header">
+  <div>
+    <div class="pp-title">Estado de Prácticas</div>
+    <div class="pp-subtitle">
+      Período 2025 — II · {{ practicas|length }} registros
+    </div>
+  </div>
+</div>
+
+<div class="pp-card">
+  <div class="pp-toolbar">
+    <div class="pp-export-btns">
+      <button class="btn-export excel" onclick="exportExcel()">
+        <i class="ti ti-file-spreadsheet"></i> Excel
+      </button>
+      <button class="btn-export pdf" onclick="exportPdf()">
+        <i class="ti ti-file-type-pdf"></i> PDF
+      </button>
+      <button class="btn-export" onclick="window.print()">
+        <i class="ti ti-printer"></i> Imprimir
+      </button>
+    </div>
+
+    <div class="pp-filter-wrap">
+      <i class="ti ti-filter" style="font-size: 14px"></i>
+      Estado:
+      <select id="filtroEstado">
+        <option value="">Todos</option>
+        <option value="Pendiente">Pendiente</option>
+        <option value="En Proceso">En Proceso</option>
+        <option value="Finalizada">Finalizada</option>
+        <option value="Cancelada">Cancelada</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="pp-search-wrap">
+    <div class="pp-search">
+      <i class="ti ti-search"></i>
+      <input
+        type="text"
+        id="ppBuscar"
+        placeholder="Buscar por estudiante, institución…"
+      />
+    </div>
+  </div>
+
+  <div class="pp-table-wrap">
+    <table id="tablaEstadoPracticas" class="pp-table">
+      <thead>
+        <tr>
+          <th>Estudiante</th>
+          <th>Institución</th>
+          <th>Estado</th>
+          <th>Horas</th>
+          <th>Modalidad</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in practicas %}
+        <tr>
+          <td>{{ p.estudiante }}</td>
+          <td>{{ p.institucion }}</td>
+          <td>
+            {% if p.estado == 'Pendiente' %}
+            <span class="badge bg-warning">{{ p.estado }}</span>
+            {% elif p.estado == 'En Proceso' %}
+            <span class="badge bg-primary">{{ p.estado }}</span>
+            {% elif p.estado == 'Finalizada' %}
+            <span class="badge bg-success">{{ p.estado }}</span>
+            {% else %}
+            <span class="badge bg-danger">{{ p.estado }}</span>
+            {% endif %}
+          </td>
+          <td>{{ p.horas_completadas }} / {{ p.horas_requeridas }}</td>
+          <td>{{ p.modalidad }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="5" class="text-center text-muted">
+            No existen prácticas registradas.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <th>Estudiante</th>
+          <th>Institución</th>
+          <th>Estado</th>
+          <th>Horas</th>
+          <th>Modalidad</th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  var dt;
+
+  $(function () {
+    dt = $("#tablaEstadoPracticas").DataTable({
+      responsive: true,
+      lengthChange: false,
+      autoWidth: false,
+      pageLength: 10,
+      language: {
+        paginate: { previous: "← Anterior", next: "Siguiente →" },
+        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+        infoEmpty: "Sin registros disponibles",
+        emptyTable: "No hay prácticas registradas",
+        zeroRecords: "No se encontraron coincidencias",
+      },
+      buttons: ["excel", "pdf", "print"],
+    });
+
+    $("#ppBuscar").on("keyup", function () {
+      dt.search(this.value).draw();
+    });
+
+    $("#filtroEstado").on("change", function () {
+      dt.column(2).search(this.value).draw();
+    });
+  });
+
+  function exportExcel() {
+    dt.button(0).trigger();
+  }
+  function exportPdf() {
+    dt.button(1).trigger();
+  }
+</script>
+{% endblock %}

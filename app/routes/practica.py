@@ -225,3 +225,114 @@ def eliminar_practica(id_practica):
         conn.close()
 
     return jsonify({"mensaje": "Práctica eliminada correctamente"})
+
+@practica_bp.route('/api/dashboard')
+def dashboard_stats():
+    conn = get_connection()
+    try:
+        with conn.cursor() as cursor:
+            
+            cursor.execute("SELECT COUNT(*) as total FROM practica")
+            total_practicas = cursor.fetchone()['total']
+
+            
+            cursor.execute("SELECT COUNT(*) as total FROM estudiante")
+            total_estudiantes = cursor.fetchone()['total']
+
+            
+            cursor.execute("SELECT COUNT(*) as total FROM institucion")
+            total_instituciones = cursor.fetchone()['total']
+
+            
+            cursor.execute("""
+                SELECT estado, COUNT(*) as cantidad 
+                FROM practica 
+                GROUP BY estado
+            """)
+            practicas_por_estado = cursor.fetchall()
+
+            
+            cursor.execute("""
+                SELECT modalidad, COUNT(*) as cantidad 
+                FROM practica 
+                GROUP BY modalidad
+            """)
+            practicas_por_modalidad = cursor.fetchall()
+
+            
+            cursor.execute("""
+                SELECT i.nombre, COUNT(p.id_practica) as cantidad
+                FROM institucion i
+                LEFT JOIN practica p ON i.id_institucion = p.id_institucion
+                GROUP BY i.id_institucion, i.nombre
+                ORDER BY cantidad DESC
+                LIMIT 5
+            """)
+            top_instituciones = cursor.fetchall()
+
+            
+            cursor.execute("""
+                SELECT 
+                    ROUND(AVG(horas_completadas), 2) as promedio_completadas,
+                    ROUND(AVG(horas_requeridas), 2) as promedio_requeridas
+                FROM practica
+            """)
+            horas_promedio = cursor.fetchone()
+
+            
+            cursor.execute("""
+                SELECT COUNT(*) as total 
+                FROM practica 
+                WHERE estado IN ('Activo', 'En Proceso', 'Pendiente')
+            """)
+            practicas_activas = cursor.fetchone()['total']
+
+    finally:
+        conn.close()
+
+    return jsonify({
+        'total_practicas': total_practicas,
+        'total_estudiantes': total_estudiantes,
+        'total_instituciones': total_instituciones,
+        'practicas_activas': practicas_activas,
+        'practicas_por_estado': practicas_por_estado,
+        'practicas_por_modalidad': practicas_por_modalidad,
+        'top_instituciones': top_instituciones,
+        'horas_promedio': horas_promedio
+    })
+
+@practica_bp.route('/estado_practicas')
+def estado_practicas():
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    sql = """
+    SELECT
+        p.id_practica,
+        CONCAT(e.nombre, ' ', e.apellido) AS estudiante,
+        i.nombre AS institucion,
+        p.fecha_inicio,
+        p.fecha_fin,
+        p.estado,
+        p.modalidad,
+        p.horas_completadas,
+        p.horas_requeridas
+    FROM practica p
+    INNER JOIN estudiante e
+        ON p.id_estudiante = e.id_estudiante
+    INNER JOIN institucion i
+        ON p.id_institucion = i.id_institucion
+    ORDER BY p.id_practica DESC
+    """
+
+    cursor.execute(sql)
+    practicas = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template(
+        'estado_practicas.html',
+        practicas=practicas
+    )

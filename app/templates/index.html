@@ -11,16 +11,261 @@ Dashboard
 {% block contenido %}
 
 <div class="page-header">
-
     <div class="page-title">
         Resumen del semestre
     </div>
-
     <div class="page-subtitle">
-        Período académico 2026 — II · Actualizado hoy
+        Período académico 2026 — II · Actualizado en tiempo real
+    </div>
+</div>
+
+<div class="row mb-4" id="statsContainer">
+    <div class="col-md-3 mb-3">
+        <div class="card bg-primary text-white shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="card-text small">Total Prácticas</p>
+                        <h3 id="totalPracticas" class="card-title">0</h3>
+                    </div>
+                    <i class="ti ti-briefcase" style="font-size: 40px; opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <div class="col-md-3 mb-3">
+        <div class="card bg-success text-white shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="card-text small">Prácticas Activas</p>
+                        <h3 id="practicasActivas" class="card-title">0</h3>
+                    </div>
+                    <i class="ti ti-player-play" style="font-size: 40px; opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card bg-info text-white shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="card-text small">Total Estudiantes</p>
+                        <h3 id="totalEstudiantes" class="card-title">0</h3>
+                    </div>
+                    <i class="ti ti-users" style="font-size: 40px; opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card bg-warning text-white shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="card-text small">Instituciones</p>
+                        <h3 id="totalInstituciones" class="card-title">0</h3>
+                    </div>
+                    <i class="ti ti-building" style="font-size: 40px; opacity: 0.5;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">Prácticas por Estado</h5>
+            </div>
+            <div class="card-body" style="position: relative; height: 300px;">
+                <canvas id="chartEstado"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">Prácticas por Modalidad</h5>
+            </div>
+            <div class="card-body" style="position: relative; height: 300px;">
+                <canvas id="chartModalidad"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">Estadísticas de Horas</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="text-muted small text-uppercase fw-bold">Promedio Horas Requeridas</label>
+                    <p class="fs-5 fw-bold text-primary" id="horasRequeridas">0</p>
+                </div>
+                <div class="mb-3">
+                    <label class="text-muted small text-uppercase fw-bold">Promedio Horas Completadas</label>
+                    <p class="fs-5 fw-bold text-success" id="horasCompletadas">0</p>
+                </div>
+                <div>
+                    <label class="text-muted small text-uppercase fw-bold">Porcentaje Promedio</label>
+                    <div class="progress" style="height: 25px;">
+                        <div id="progressBar" class="progress-bar bg-success" role="progressbar" style="width: 0%;">
+                            <span id="progressText">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">Top 5 Instituciones</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm table-hover" id="topInstTable">
+                    <thead>
+                        <tr>
+                            <th>Institución</th>
+                            <th class="text-center">Prácticas</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+let chartEstado = null;
+let chartModalidad = null;
+
+async function cargarDashboard() {
+    try {
+        const respuesta = await fetch('/api/dashboard');
+        const datos = await respuesta.json();
+
+        
+        document.getElementById('totalPracticas').textContent = datos.total_practicas;
+        document.getElementById('practicasActivas').textContent = datos.practicas_activas;
+        document.getElementById('totalEstudiantes').textContent = datos.total_estudiantes;
+        document.getElementById('totalInstituciones').textContent = datos.total_instituciones;
+
+        
+        const horasReq = parseFloat(datos.horas_promedio.promedio_requeridas || 0);
+        const horasComp = parseFloat(datos.horas_promedio.promedio_completadas || 0);
+        const porcentaje = horasReq > 0 ? Math.round((horasComp / horasReq) * 100) : 0;
+
+        document.getElementById('horasRequeridas').textContent = horasReq.toFixed(2);
+        document.getElementById('horasCompletadas').textContent = horasComp.toFixed(2);
+        document.getElementById('progressBar').style.width = porcentaje + '%';
+        document.getElementById('progressText').textContent = porcentaje + '%';
+
+        
+        const estadosLabels = datos.practicas_por_estado.map(e => e.estado);
+        const estadosDatos = datos.practicas_por_estado.map(e => e.cantidad);
+        
+        const ctxEstado = document.getElementById('chartEstado').getContext('2d');
+        if (chartEstado) chartEstado.destroy();
+        chartEstado = new Chart(ctxEstado, {
+            type: 'doughnut',
+            data: {
+                labels: estadosLabels,
+                datasets: [{
+                    data: estadosDatos,
+                    backgroundColor: ['#0d6efd', '#198754', '#ffc107', '#dc3545', '#6c757d'],
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        
+        const modalidadLabels = datos.practicas_por_modalidad.map(m => m.modalidad);
+        const modalidadDatos = datos.practicas_por_modalidad.map(m => m.cantidad);
+        
+        const ctxModalidad = document.getElementById('chartModalidad').getContext('2d');
+        if (chartModalidad) chartModalidad.destroy();
+        chartModalidad = new Chart(ctxModalidad, {
+            type: 'bar',
+            data: {
+                labels: modalidadLabels,
+                datasets: [{
+                    label: 'Cantidad',
+                    data: modalidadDatos,
+                    backgroundColor: ['#0d6efd', '#198754', '#ffc107', '#dc3545'],
+                    borderColor: ['#0d6efd', '#198754', '#ffc107', '#dc3545'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+
+        
+        const tbodyTopInst = document.querySelector('#topInstTable tbody');
+        tbodyTopInst.innerHTML = '';
+        datos.top_instituciones.forEach(inst => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${inst.nombre}</td>
+                <td class="text-center"><span class="badge bg-primary">${inst.cantidad}</span></td>
+            `;
+            tbodyTopInst.appendChild(row);
+        });
+
+    } catch (error) {
+        console.error('Error cargando dashboard:', error);
+        alert('Error al cargar el dashboard');
+    }
+}
+
+
+document.addEventListener('DOMContentLoaded', cargarDashboard);
+
+
+setInterval(cargarDashboard, 30000);
+</script>
 
 {% endblock %}
 

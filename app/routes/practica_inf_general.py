@@ -1,7 +1,6 @@
 #practica.py
-from flask import Blueprint, jsonify
-from app.models import Practica
-from flask import render_template
+from flask import Blueprint, jsonify, render_template
+from app.database import get_connection
 
 practica_inf_general_bp = Blueprint(
     'practica_inf_general',
@@ -11,36 +10,47 @@ practica_inf_general_bp = Blueprint(
 @practica_inf_general_bp.route('/practicas-general')
 def ver_practicas():
 
-    practicas = Practica.query.all()
+    conn = get_connection()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT * FROM practica")
+            practicas = cursor.fetchall()
+    finally:
+        conn.close()
 
     return render_template(
         'practicas.html',
         practicas=practicas
     )
 
-@practica_bp.route('/api/practicas', methods=['GET'])
+@practica_inf_general_bp.route('/api/practicas', methods=['GET'])
 def listar_practicas():
 
-    practicas = Practica.query.all()
+    conn = get_connection()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                SELECT 
+                    p.id_practica, p.estado, p.horas_requeridas, p.horas_completadas,
+                    e.nombre, e.apellido
+                FROM practica p
+                JOIN estudiante e ON p.id_estudiante = e.id_estudiante
+            """)
+            practicas = cursor.fetchall()
 
-    resultado = []
+        resultado = []
+        for p in practicas:
+            porcentaje = 0
+            if p.get('horas_requeridas') and p['horas_requeridas'] > 0:
+                porcentaje = (p['horas_completadas'] / p['horas_requeridas']) * 100
 
-    for p in practicas:
-
-        porcentaje = 0
-
-        if p.horas_requeridas:
-            porcentaje = (
-                p.horas_completadas /
-                p.horas_requeridas
-            ) * 100
-
-        resultado.append({
-            "id": p.id_practica,
-            "estudiante":
-                f"{p.estudiante.nombre} {p.estudiante.apellido}",
-            "estado": p.estado,
-            "avance": round(porcentaje, 2)
-        })
+            resultado.append({
+                "id": p['id_practica'],
+                "estudiante": f"{p['nombre']} {p['apellido']}",
+                "estado": p['estado'],
+                "avance": round(porcentaje, 2)
+            })
+    finally:
+        conn.close()
 
     return jsonify(resultado)
