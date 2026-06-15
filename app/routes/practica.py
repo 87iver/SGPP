@@ -15,7 +15,7 @@ def ver_practicas():
         practicas=practicas
     )
 
-@practica_bp.route('/practicas', methods=['GET'])
+@practica_bp.route('/api/practicas', methods=['GET'])
 def listar_practicas():
 
     practicas = Practica.query.all()
