@@ -88,11 +88,10 @@ la Práctica Profesional {% endblock %} {% block contenido %}
                           <tr>
                             <td>{{ est.id_estudiante }}</td>
                             <td>
-                              <button
+                              <button></button>
                                 type="button"
                                 class="btn btn-success btn-sm"
-                                onclick="seleccionarEstudiante({{ est.id_estudiante }}, '{{ est.nombre }} {{ est.apellido }}')"
-                              >
+                                onclick="seleccionarEstudiante({{ est.id_estudiante }}, '{{ est.nombre }} {{ est.apellido }}')>
                                 Seleccionar
                               </button>
                             </td>
@@ -197,7 +196,7 @@ la Práctica Profesional {% endblock %} {% block contenido %}
                           <tr>
                             <td>{{ inst.id_institucion }}</td>
                             <td>
-                              <button
+                              <button></button>
                                 type="button"
                                 class="btn btn-success btn-sm"
                                 onclick="seleccionarInstitucion({{ inst.id_institucion }}, '{{ inst.nombre }}')"
