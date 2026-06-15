@@ -10,6 +10,32 @@ Consultas y reportes
 
 {% block contenido %}
 
+<script>
+  function getUserRole() {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return 'Usuario';
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.rol || payload.sub?.rol || 'Usuario';
+    } catch (e) {
+      return 'Usuario';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const role = getUserRole();
+
+    document.querySelectorAll('[data-role-card]').forEach(function (el) {
+      const cardType = el.getAttribute('data-role-card');
+      if (role === 'Administrador') {
+        el.style.display = '';
+      } else {
+        el.style.display = (cardType === 'user-only') ? '' : 'none';
+      }
+    });
+  });
+</script>
+
 <div class="container mt-4">
   <div class="mb-4">
     <h4 class="fw-semibold mb-1">Consultas y Reportes</h4>
@@ -19,7 +45,7 @@ Consultas y reportes
   <div class="row g-3">
 
 
-    <div class="col-md-4">
+    <div class="col-md-4" data-role-card="admin-only">
       <div class="card border h-100">
         <div class="card-body d-flex flex-column gap-3">
           <div class="d-flex align-items-center gap-3">
@@ -40,7 +66,7 @@ Consultas y reportes
     </div>
 
     
-    <div class="col-md-4">
+    <div class="col-md-4" data-role-card="user-only">
       <div class="card border h-100">
         <div class="card-body d-flex flex-column gap-3">
           <div class="d-flex align-items-center gap-3">
@@ -61,7 +87,7 @@ Consultas y reportes
     </div>
 
 
-    <div class="col-md-4">
+    <div class="col-md-4" data-role-card="admin-only">
       <div class="card border h-100">
         <div class="card-body d-flex flex-column gap-3">
           <div class="d-flex align-items-center gap-3">
@@ -82,7 +108,7 @@ Consultas y reportes
     </div>
 
 
-    <div class="col-md-4">
+    <div class="col-md-4" data-role-card="user-only">
       <div class="card border h-100">
         <div class="card-body d-flex flex-column gap-3">
           <div class="d-flex align-items-center gap-3">
@@ -103,7 +129,7 @@ Consultas y reportes
     </div>
 
 
-    <div class="col-md-4">
+    <div class="col-md-4" data-role-card="admin-only">
       <div class="card border h-100">
         <div class="card-body d-flex flex-column gap-3">
           <div class="d-flex align-items-center gap-3">
@@ -124,7 +150,7 @@ Consultas y reportes
     </div>
 
     
-    <div class="col-md-4">
+    <div class="col-md-4" data-role-card="user-only">
       <div class="card border h-100">
         <div class="card-body d-flex flex-column gap-3">
           <div class="d-flex align-items-center gap-3">

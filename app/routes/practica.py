@@ -1,14 +1,23 @@
 # app/routes/practica.py
 
 from flask import Blueprint, request, jsonify, render_template, abort
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.database import get_connection
 from datetime import datetime
 
 practica_bp = Blueprint('practica', __name__)
 
 
+def _is_admin():
+    identity = get_jwt_identity() or {}
+    return (identity.get('rol') if isinstance(identity, dict) else None) == 'Administrador'
+
+
 @practica_bp.route('/practicas', methods=['POST'])
+@jwt_required()
 def registrar_practica():
+    if not _is_admin():
+        return jsonify({"mensaje": "No autorizado"}), 403
 
     datos = request.get_json()
 
@@ -130,7 +139,10 @@ def obtener_practica(id_practica):
 
 
 @practica_bp.route('/practicas/<int:id_practica>', methods=['PUT'])
+@jwt_required()
 def editar_practica(id_practica):
+    if not _is_admin():
+        return jsonify({"mensaje": "No autorizado"}), 403
 
     conn = get_connection()
     try:
@@ -168,7 +180,10 @@ def editar_practica(id_practica):
 
 
 @practica_bp.route('/editar-practica/<int:id_practica>')
+@jwt_required()
 def formulario_editar_practica(id_practica):
+    if not _is_admin():
+        abort(403)
 
     conn = get_connection()
     try:
@@ -205,7 +220,10 @@ def formulario_editar_practica(id_practica):
 
 
 @practica_bp.route('/practicas/<int:id_practica>', methods=['DELETE'])
+@jwt_required()
 def eliminar_practica(id_practica):
+    if not _is_admin():
+        return jsonify({"mensaje": "No autorizado"}), 403
 
     conn = get_connection()
     try:

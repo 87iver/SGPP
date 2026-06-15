@@ -36,8 +36,8 @@
 
       <nav class="sidebar-nav">
         <div class="nav-section-label">Principal</div>
-        <a href="/" class="nav-item {% if request.path == '/' %}active{% endif %}">
-          <i class="ti ti-layout-dashboard"></i> Dashboard
+        <a id="navResumenSemestre" href="/dashboard" class="nav-item {% if request.path.startswith('/dashboard') %}active{% endif %}" data-role-nav="admin-only">
+          <i class="ti ti-layout-dashboard"></i> Resumen del semestre
         </a>
         <a href="/informacion_practicas" class="nav-item {% if request.path == '/informacion_practicas' %}active{% endif %}">
           <i class="ti ti-briefcase"></i> Prácticas Profesionales
@@ -74,9 +74,9 @@
           <span class="current">{% block pagina %}Dashboard{% endblock %}</span>
         </div>
         <div class="topbar-actions">
-          <div class="period-btn">
+          <button type="button" class="period-btn btn btn-link p-0 text-decoration-none" id="btnCerrarSesion">
             <i class="ti ti-power"></i> Cerrar sesión
-          </div>
+          </button>
         </div>
       </header>
 
@@ -106,6 +106,17 @@
 
 
     <script>
+      function getUserRole() {
+        try {
+          const token = localStorage.getItem('token');
+          if (!token) return 'Usuario';
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          return payload.rol || payload.sub?.rol || 'Usuario';
+        } catch (e) {
+          return 'Usuario';
+        }
+      }
+
       $(document).ready(function () {
         if ($('#tablaInstituciones').length && !$.fn.DataTable.isDataTable('#tablaInstituciones')) {
           $('#tablaInstituciones').DataTable();
@@ -113,6 +124,22 @@
         if ($('#tablaEstudiantes').length && !$.fn.DataTable.isDataTable('#tablaEstudiantes')) {
           $('#tablaEstudiantes').DataTable();
         }
+
+        const role = getUserRole();
+        const seguimientoLink = document.querySelector('a[href="/seguimientos"]');
+        if (seguimientoLink && role !== 'Administrador') {
+          seguimientoLink.style.display = 'none';
+        }
+
+        document.querySelectorAll('[data-role-nav="admin-only"]').forEach(function (el) {
+          el.style.display = (role === 'Administrador') ? '' : 'none';
+        });
+
+        document.getElementById('btnCerrarSesion')?.addEventListener('click', function () {
+          localStorage.removeItem('token');
+          localStorage.removeItem('access_token');
+          window.location.href = '/login';
+        });
       });
     </script>
 

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+</head>
+<body>
+    <main class="login-shell">
+        <section class="login-card">
+            <div class="login-brand">
+                <div class="login-brand-badge">SG</div>
+                <div>
+                    <h2>Iniciar sesión</h2>
+                    <p>Accede al sistema de prácticas preprofesionales</p>
+                </div>
+            </div>
+
+            <div class="login-form">
+                <div class="field">
+                    <label for="username">Usuario</label>
+                    <input type="text" id="username" placeholder="Ingrese su usuario">
+                </div>
+
+                <div class="field">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" placeholder="Ingrese su contraseña">
+                </div>
+
+                <button class="login-btn" onclick="login()">Entrar</button>
+                <p id="msg" class="login-msg"></p>
+            </div>
+
+            <p class="login-footer">SGPP • Sistema de Gestión de Prácticas</p>
+        </section>
+    </main>
+
+<script>
+async function login() {
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    
+
+    const response = await fetch("/login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password })
+    });
+
+    const data = await response.json();
+    console.log(data);
+
+    if (response.ok) {
+        const token = data.access_token || data.token;
+
+        if (!token) {
+            document.getElementById("msg").innerText = "No se recibió un token válido.";
+            return;
+        }
+
+        localStorage.setItem("token", token);
+        window.location.href = "/dashboard";
+    } else {
+        document.getElementById("msg").innerText = data.msg || "Error al iniciar sesión.";
+    }
+}
+</script>
+
+</body>
+</html>

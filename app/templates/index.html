@@ -9,6 +9,19 @@ Dashboard
 {% endblock %}
 
 {% block contenido %}
+<script>
+fetch("/perfil", {
+    method: "GET",
+    headers: {
+        "Authorization": "Bearer " + localStorage.getItem("token")
+    }
+})
+.then(res => res.json())
+.then(data => {
+    console.log(data);
+});
+</script>
+
 
 <div class="page-header">
     <div class="page-title">

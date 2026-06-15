@@ -54,35 +54,46 @@
         </tr>
     </thead>
 
-    <tbody>
-        {% for p in practicas %}
+    <tbody id="tabla"></tbody>
+
+<script>
+async function cargarPracticas() {
+
+    const token = localStorage.getItem("token");
+
+    const res = await fetch("/api/practicas", {
+        headers: {
+            "Authorization": "Bearer " + token
+        }
+    });
+
+    if (!res.ok) {
+        alert("No autorizado");
+        return;
+    }
+
+    const data = await res.json();
+
+    let html = "";
+
+    data.forEach(p => {
+        html += `
         <tr>
-            <td>{{ p.id_practica }}</td>
-
-            <td>
-                {{ p.estudiante.nombre }}
-                {{ p.estudiante.apellido }}
-            </td>
-
-            <td>
-                {{ p.institucion.nombre }}
-            </td>
-
-            <td>
-                {{ p.estado }}
-            </td>
-
-            <td>
-                {{ p.horas_completadas }}/{{ p.horas_requeridas }}
-            </td>
-
-            <td>
-                {{ ((p.horas_completadas / p.horas_requeridas)*100)|round(2) }} %
-            </td>
-
+            <td>${p.id}</td>
+            <td>${p.estudiante}</td>
+            <td>${p.institucion}</td>
+            <td>${p.estado}</td>
+            <td>${p.horas}</td>
+            <td>${p.avance}%</td>
         </tr>
-        {% endfor %}
-    </tbody>
+        `;
+    });
+
+    document.getElementById("tabla").innerHTML = html;
+}
+
+cargarPracticas();
+</script>
 </table>
 
 </body>

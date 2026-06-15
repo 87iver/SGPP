@@ -7,7 +7,7 @@ block pagina %} Listado de Prácticas {% endblock %} {% block contenido %}
       Período 2025 — II · {{ practicas|length }} registros
     </div>
   </div>
-  <a href="/registrar-practica" class="btn-add">
+  <a id="btnNuevaPractica" href="/registrar-practica" class="btn-add d-none">
     <i class="ti ti-plus"></i> Nueva práctica
   </a>
 </div>
@@ -61,7 +61,7 @@ block pagina %} Listado de Prácticas {% endblock %} {% block contenido %}
           <th>Fecha Fin</th>
           <th>Estado</th>
           <th>Modalidad</th>
-          <th>Horas</th>
+          <th class="col-horas">Horas</th>
           <th style="width: 90px">Acciones</th>
         </tr>
       </thead>
@@ -69,7 +69,7 @@ block pagina %} Listado de Prácticas {% endblock %} {% block contenido %}
         {% for practica in practicas %}
         <tr>
           <td>{{ practica.id_practica }}</td>
-          <td>
+          <td class="col-estudiante">
             {{ practica.estudiante_nombre }} {{ practica.estudiante_apellido }}
           </td>
           <td>{{ practica.institucion_nombre }}</td>
@@ -77,7 +77,7 @@ block pagina %} Listado de Prácticas {% endblock %} {% block contenido %}
           <td>{{ practica.fecha_fin }}</td>
           <td>{{ practica.estado }}</td>
           <td>{{ practica.modalidad }}</td>
-          <td>
+          <td class="col-horas">
             {{ practica.horas_completadas }} / {{ practica.horas_requeridas }}
           </td>
 
@@ -214,15 +214,18 @@ block pagina %} Listado de Prácticas {% endblock %} {% block contenido %}
               </div>
 
               <a
+                id="btnEditarPractica-{{ practica.id_practica }}"
                 href="/editar-practica/{{ practica.id_practica }}"
-                class="btn btn-success btn-sm"
+                class="btn btn-success btn-sm d-none"
                 title="Editar"
               >
                 <i class="ti ti-pencil"></i>
               </a>
               <button
-                class="btn btn-danger btn-sm"
-                onclick="eliminarPractica({{ practica.id_practica }})"
+                type="button"
+                id="btnEliminarPractica-{{ practica.id_practica }}"
+                class="btn btn-danger btn-sm d-none btn-delete-practica"
+                data-id="{{ practica.id_practica }}"
                 title="Eliminar"
               >
                 <i class="ti ti-trash"></i>
@@ -258,7 +261,30 @@ block pagina %} Listado de Prácticas {% endblock %} {% block contenido %}
 <script>
   var dt;
 
+  function getUserRole() {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return 'Usuario';
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.rol || payload.sub?.rol || 'Usuario';
+    } catch (e) {
+      return 'Usuario';
+    }
+  }
+
   $(function () {
+    const role = getUserRole();
+    if (role === 'Administrador') {
+      $('#btnNuevaPractica').removeClass('d-none');
+      $('[id^="btnEditarPractica-"]').removeClass('d-none');
+      $('[id^="btnEliminarPractica-"]').removeClass('d-none');
+    } else {
+      $('[id^="btnEditarPractica-"]').addClass('d-none');
+      $('[id^="btnEliminarPractica-"]').addClass('d-none');
+      $('.pp-actions .btn-info').addClass('d-none');
+      $('th:last-child, td:last-child').hide();
+    }
+
     dt = $("#tablaPracticas").DataTable({
       responsive: true,
       lengthChange: false,
@@ -281,6 +307,16 @@ block pagina %} Listado de Prácticas {% endblock %} {% block contenido %}
 
     $("#filtroEstado").on("change", function () {
       dt.column(5).search(this.value).draw();
+    });
+
+    if (role !== 'Administrador') {
+      $('.modal-title').hide();
+      dt.column(1).visible(false);
+      dt.column(7).visible(false);
+    }
+
+    $('.btn-delete-practica').on('click', function () {
+      eliminarPractica($(this).data('id'));
     });
   });
 
