@@ -1,23 +1,28 @@
 #seguimineto.py
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, render_template, redirect
 from datetime import datetime
 from app import db
 from app.models import Seguimiento
-from flask import render_template
-from flask_jwt_extended import (jwt_required)
+from flask_jwt_extended import jwt_required
 
 seguimiento_bp = Blueprint(
     'seguimiento',
     __name__
 )
 
+
 @seguimiento_bp.route('/seguimiento-form')
 def formulario():
 
+    seguimientos = Seguimiento.query.all()
+
     return render_template(
-        'seguimiento.html'
+        'seguimiento.html',
+        seguimientos=seguimientos
     )
 
+
+# GET TODOS
 @seguimiento_bp.route('/seguimiento', methods=['GET'])
 def listar_seguimientos():
 
@@ -32,69 +37,42 @@ def listar_seguimientos():
             "practica": s.id_practica,
             "fecha": str(s.fecha),
             "observacion": s.observacion,
-            "avance": s.porcentaje_avance
+            "avance": s.porcentaje_avance,
+            "horas": s.horas_registradas
         })
 
     return jsonify(resultado)
 
 
+# GET UNO
 @seguimiento_bp.route(
     '/seguimiento/<int:id>',
-    methods=['PUT']
+    methods=['GET']
 )
-@jwt_required()
-def actualizar_seguimiento(id):
-
-    datos = request.get_json()
+def obtener_seguimiento(id):
 
     seguimiento = Seguimiento.query.get(id)
 
     if not seguimiento:
         return jsonify({
-            "error":"No encontrado"
-        }),404
-
-    seguimiento.observacion = datos["observacion"]
-
-    seguimiento.porcentaje_avance = datos["porcentaje_avance"]
-
-    seguimiento.horas_registradas = datos["horas_registradas"]
-
-    db.session.commit()
+            "error": "No encontrado"
+        }), 404
 
     return jsonify({
-        "mensaje":"Actualizado"
-    })
-
-@seguimiento_bp.route(
-    '/seguimiento/<int:id>',
-    methods=['DELETE']
-)
-@jwt_required()
-def eliminar_seguimiento(id):
-
-    seguimiento = Seguimiento.query.get(id)
-
-    if not seguimiento:
-        return jsonify({
-            "error":"No encontrado"
-        }),404
-
-    db.session.delete(seguimiento)
-
-    db.session.commit()
-
-    return jsonify({
-        "mensaje":"Eliminado"
+        "id": seguimiento.id_seguimiento,
+        "practica": seguimiento.id_practica,
+        "fecha": str(seguimiento.fecha),
+        "observacion": seguimiento.observacion,
+        "avance": seguimiento.porcentaje_avance,
+        "horas": seguimiento.horas_registradas
     })
 
 
-
+# POST
 @seguimiento_bp.route(
     '/seguimiento',
     methods=['POST']
 )
-@jwt_required()
 def registrar_avance():
 
     datos = request.form
@@ -113,28 +91,71 @@ def registrar_avance():
     db.session.add(nuevo)
     db.session.commit()
 
-    return jsonify({
-        "mensaje":
-        "Seguimiento registrado correctamente"
-    })
+    return redirect('/seguimiento-form')
 
+
+# PUT
 @seguimiento_bp.route(
     '/seguimiento/<int:id>',
-    methods=['GET']
+    methods=['PUT']
 )
-def obtener_seguimiento(id):
+@jwt_required()
+def actualizar_seguimiento(id):
+
+    datos = request.get_json()
 
     seguimiento = Seguimiento.query.get(id)
 
     if not seguimiento:
         return jsonify({
-            "error":"No encontrado"
-        }),404
+            "error": "No encontrado"
+        }), 404
+
+    seguimiento.observacion = datos["observacion"]
+    seguimiento.porcentaje_avance = datos["porcentaje_avance"]
+    seguimiento.horas_registradas = datos["horas_registradas"]
+
+    db.session.commit()
 
     return jsonify({
-        "id": seguimiento.id_seguimiento,
-        "practica": seguimiento.id_practica,
-        "fecha": str(seguimiento.fecha),
-        "observacion": seguimiento.observacion,
-        "avance": seguimiento.porcentaje_avance
+        "mensaje": "Actualizado"
     })
+
+
+# DELETE
+@seguimiento_bp.route(
+    '/seguimiento/<int:id>',
+    methods=['DELETE']
+)
+@jwt_required()
+def eliminar_seguimiento(id):
+
+    seguimiento = Seguimiento.query.get(id)
+
+    if not seguimiento:
+        return jsonify({
+            "error": "No encontrado"
+        }), 404
+
+    db.session.delete(seguimiento)
+    db.session.commit()
+
+    return jsonify({
+        "mensaje": "Eliminado"
+    })
+
+
+# ELIMINAR DESDE INTERFAZ
+@seguimiento_bp.route(
+    '/seguimiento/eliminar/<int:id>'
+)
+def eliminar_web(id):
+
+    seguimiento = Seguimiento.query.get(id)
+
+    if seguimiento:
+
+        db.session.delete(seguimiento)
+        db.session.commit()
+
+    return redirect('/seguimiento-form')

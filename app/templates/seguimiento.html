@@ -7,14 +7,18 @@
 <style>
 
 body{
-    font-family:Arial;
+    font-family: Arial;
     background:#f4f4f4;
     padding:30px;
 }
 
+h1,h2{
+    text-align:center;
+}
+
 form{
     background:white;
-    max-width:600px;
+    max-width:700px;
     margin:auto;
     padding:25px;
     border-radius:10px;
@@ -36,6 +40,45 @@ button{
     cursor:pointer;
 }
 
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+    margin-top:40px;
+}
+
+th{
+    background:#0066cc;
+    color:white;
+    padding:12px;
+}
+
+td{
+    padding:10px;
+    border:1px solid #ddd;
+    text-align:center;
+}
+
+tr:nth-child(even){
+    background:#f9f9f9;
+}
+
+.btn-eliminar{
+    background:#cc0000;
+    text-decoration:none;
+    color:white;
+    padding:8px 12px;
+    border-radius:5px;
+}
+
+.btn-editar{
+    background:#28a745;
+    text-decoration:none;
+    color:white;
+    padding:8px 12px;
+    border-radius:5px;
+}
+
 </style>
 
 </head>
@@ -47,25 +90,83 @@ button{
 <form action="/seguimiento" method="POST">
 
     <label>ID Práctica</label>
-    <input type="number" name="id_practica">
+    <input type="number" name="id_practica" required>
 
     <label>Fecha</label>
-    <input type="date" name="fecha">
+    <input type="date" name="fecha" required>
 
     <label>Observación</label>
-    <textarea name="observacion"></textarea>
+    <textarea name="observacion" required></textarea>
 
     <label>Porcentaje de avance</label>
-    <input type="number" name="porcentaje_avance">
+    <input type="number" name="porcentaje_avance" required>
 
     <label>Horas registradas</label>
-    <input type="number" name="horas_registradas">
+    <input type="number" name="horas_registradas" required>
 
     <button type="submit">
         Guardar Seguimiento
     </button>
 
 </form>
+
+<h2>Seguimientos Registrados</h2>
+
+<table>
+
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>ID Práctica</th>
+            <th>Fecha</th>
+            <th>Observación</th>
+            <th>Avance (%)</th>
+            <th>Horas</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    {% for s in seguimientos %}
+
+        <tr>
+
+            <td>{{ s.id_seguimiento }}</td>
+
+            <td>{{ s.id_practica }}</td>
+
+            <td>{{ s.fecha }}</td>
+
+            <td>{{ s.observacion }}</td>
+
+            <td>{{ s.porcentaje_avance }}</td>
+
+            <td>{{ s.horas_registradas }}</td>
+
+            <td>
+
+                <a href="#" class="btn-editar">
+                    Editar
+                </a>
+
+                <a
+                    href="/seguimiento/eliminar/{{ s.id_seguimiento }}"
+                    class="btn-eliminar"
+                    onclick="return confirm('¿Desea eliminar este seguimiento?')"
+                >
+                    Eliminar
+                </a>
+
+            </td>
+
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
 
 </body>
 </html>
