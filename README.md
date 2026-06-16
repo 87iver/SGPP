@@ -1,16 +1,15 @@
 # SGPP - Sistema de Gestión de Prácticas Profesionales
 
 ## Descripción
-Sistema web desarrollado en Flask para gestionar estudiantes, empresas y prácticas.
-
+Sistema web desarrollado en Flask para la gestión de estudiantes, empresas y prácticas preprofesionales, con autenticación mediante JWT.
 ## Tecnologías
 - Flask
-- MySQL (XAMPP)
-- SQLAlchemy
-- HTML, CSS
-
+- PyMySQL / MySQL (XAMPP)
+- Flask-JWT-Extended
+- HTML, CSS, JavaScript
+- Ninja 2
 ## Instalación
-1. pip install -r requirements.txt
-2. Crear BD sgpp en XAMPP
-3. Importar sgpp.sql
-4. python run.py
+### 1. Clonar o descomprimir el proyecto
+### 2. Crear entorno virtual
+```bash
+python -m venv venv

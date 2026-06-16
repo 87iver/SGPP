@@ -1,4 +1,4 @@
-# app/database.py
+#app/database.py
 
 import pymysql
 
@@ -10,3 +10,5 @@ def get_connection():
         database='sgpp',
         cursorclass=pymysql.cursors.DictCursor  
     )
+
+
